@@ -158,9 +158,12 @@ class Configuration:
         parser.read_string(ini_settings)
         self.add_map(_develop_configparser_values(parser))
 
+    def _handle_missing_configuration_file(self, file_path):
+        raise FileNotFoundError(f'missing configuration file: {file_path}')
+
     def add_ini_file(self, file_path, optional=False):
         """
-        Reads and parse an ini file, inside this configuration.
+        Reads and parse an ini file, merging its values into an instance of Configuration.
 
         :param file_path: path to an ini file
         :param optional: whether the ini file is optional.
@@ -168,14 +171,14 @@ class Configuration:
         if not os.path.exists(file_path):
             if optional:
                 return
-            raise FileNotFoundError()
+            self._handle_missing_configuration_file(file_path)
         parser = configparser.ConfigParser()
         parser.read(file_path)
         self.add_map(_develop_configparser_values(parser))
 
     def add_json_file(self, file_path, optional=False):
         """
-        Reads and parse an json file, inside this configuration.
+        Reads and parse an json file, merging its values into an instance of Configuration.
 
         :param file_path: path to an json file
         :param optional: whether the json file is optional.
@@ -183,14 +186,14 @@ class Configuration:
         if not os.path.exists(file_path):
             if optional:
                 return
-            raise FileNotFoundError()
+            self._handle_missing_configuration_file(file_path)
 
         with open(file_path, 'rt', encoding='utf-8') as f:
             self.add_map(json.load(f))
 
     def add_yaml_file(self, file_path, optional=False):
         """
-        Reads and parse an yaml file, inside this configuration.
+        Reads and parse an yaml file, merging its values into an instance of Configuration.
 
         :param file_path: path to an yaml file
         :param optional: whether the yaml file is optional.
@@ -198,7 +201,7 @@ class Configuration:
         if not os.path.exists(file_path):
             if optional:
                 return
-            raise FileNotFoundError()
+            self._handle_missing_configuration_file(file_path)
 
         with open(file_path, 'rt', encoding='utf-8') as f:
             self.add_map(yaml.load(f))

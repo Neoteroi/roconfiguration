@@ -29,6 +29,22 @@ class TestConfiguration:
         with pytest.raises(KeyError):
             print(config.a)
 
+    def test_missing_file_error(self):
+        config = Configuration()
+
+        filepath = pkg_resources.resource_filename(__name__, './not_existing.foo')
+
+        assert not os.path.exists(filepath)
+
+        with pytest.raises(FileNotFoundError) as fe:
+            config.add_ini_file(filepath)
+
+        with pytest.raises(FileNotFoundError):
+            config.add_json_file(filepath)
+
+        with pytest.raises(FileNotFoundError):
+            config.add_yaml_file(filepath)
+
     def test_mapping_adding(self):
         config = Configuration({'foo': True})
 
