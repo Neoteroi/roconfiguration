@@ -1,3 +1,5 @@
+[![Build status](https://robertoprevato.visualstudio.com/roconfiguration/_apis/build/status/roconfiguration-CI)](https://robertoprevato.visualstudio.com/roconfiguration/_build/latest?definitionId=10)
+
 # Python configuration utilities
 Implementation of key-value pair based configuration for Python applications.
 
