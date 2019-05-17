@@ -11,3 +11,7 @@ release: test
 
 test:
 	pytest
+
+
+testcov:
+	pytest --cov-report html --cov-report annotate --cov=roconfiguration tests/

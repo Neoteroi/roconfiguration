@@ -191,12 +191,13 @@ class Configuration:
         with open(file_path, 'rt', encoding='utf-8') as f:
             self.add_map(json.load(f))
 
-    def add_yaml_file(self, file_path, optional=False):
+    def add_yaml_file(self, file_path, optional=False, safe_load=True):
         """
         Reads and parse an yaml file, merging its values into an instance of Configuration.
 
         :param file_path: path to an yaml file
         :param optional: whether the yaml file is optional.
+        :param safe_load: whether to use safe load
         """
         if not os.path.exists(file_path):
             if optional:
@@ -204,5 +205,10 @@ class Configuration:
             self._handle_missing_configuration_file(file_path)
 
         with open(file_path, 'rt', encoding='utf-8') as f:
-            self.add_map(yaml.load(f))
 
+            if safe_load:
+                data = yaml.safe_load(f)
+            else:
+                data = yaml.full_load(f)
+
+            self.add_map(data)
