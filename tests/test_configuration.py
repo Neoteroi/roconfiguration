@@ -1,7 +1,9 @@
 import os
 import pytest
 import pkg_resources
-from roconfiguration import Configuration
+from uuid import uuid4
+from pytest import raises
+from roconfiguration import Configuration, ConfigurationOverrideError
 
 
 class TestConfiguration:
@@ -36,7 +38,7 @@ class TestConfiguration:
 
         assert not os.path.exists(filepath)
 
-        with pytest.raises(FileNotFoundError) as fe:
+        with pytest.raises(FileNotFoundError):
             config.add_ini_file(filepath)
 
         with pytest.raises(FileNotFoundError):
@@ -44,6 +46,45 @@ class TestConfiguration:
 
         with pytest.raises(FileNotFoundError):
             config.add_yaml_file(filepath)
+
+    def test_optional_ini_does_not_throw(self):
+        config = Configuration()
+
+        not_existing_file = f'{uuid4()}.ini'
+
+        config.add_ini_file(not_existing_file, optional=True)
+
+        assert True is True
+
+    def test_optional_json_does_not_throw(self):
+        config = Configuration()
+
+        not_existing_file = f'{uuid4()}.json'
+
+        config.add_json_file(not_existing_file, optional=True)
+
+        assert True is True
+
+    def test_optional_yaml_does_not_throw(self):
+        config = Configuration()
+
+        not_existing_file = f'{uuid4()}.yaml'
+
+        config.add_yaml_file(not_existing_file, optional=True)
+
+        assert True is True
+
+    def test_yaml_can_use_full_loader(self):
+        filepath = pkg_resources.resource_filename(__name__, './yaml_example_01.yaml')
+
+        config = Configuration()
+        config.add_yaml_file(filepath, safe_load=False)
+
+        assert config.host == 'localhost'
+        assert config.port == 44555
+        assert config.jwt_issuer == 'https://example.org'
+        assert config.jwt_audience == 'https://example.org'
+        assert config.jwt_algorithms == ['HS256']
 
     def test_mapping_adding(self):
         config = Configuration({'foo': True})
@@ -111,6 +152,16 @@ class TestConfiguration:
         assert config.b2c[1].tenant == '4'
         assert config.b2c[2].tenant == '3'
 
+    def test_overriding_nested_list_values_raises_for_invalid_key(self):
+        config = Configuration({'b2c': [
+            {'tenant': '1'},
+            {'tenant': '2'},
+            {'tenant': '3'}
+        ]})
+
+        with raises(ConfigurationOverrideError):
+            config.add_value('b2c:foo:tenant', '4')
+
     def test_overriding_nested_list_item(self):
         config = Configuration({'ids': [1, 2, 3, 4, 5]})
 
@@ -127,7 +178,7 @@ class TestConfiguration:
     def test_invalid_overriding_nested_list_item(self):
         config = Configuration({'ids': [1, 2, 3, 4, 5]})
 
-        with pytest.raises(TypeError):
+        with pytest.raises(ConfigurationOverrideError):
             config.add_value('ids:1:foo', 6)
 
     def test_add_environmental_variables(self):
@@ -286,3 +337,34 @@ forward_x11 = no"""
     def test_keywords_handling(self, keyword):
         config = Configuration({keyword: 1})
         assert config[keyword] == 1
+
+
+@pytest.mark.parametrize('source,key,value,expected', [
+    ({}, 'a', 100, {'a': 100}),
+    ({}, 'message', 'Hello World', {'message': 'Hello World'}),
+    ({}, 'a:b', 'Hello World', {'a': {'b': 'Hello World'}}),
+    ({}, 'a:b:c', 'Hello World', {'a': {'b': {'c': 'Hello World'}}}),
+    ({'a': ['Source']}, 'a:0', 'Hello World', {'a': ['Hello World']}),
+    ({'a': {'b': ['Source']}}, 'a:b:0', 'Hello World', {'a': {'b': ['Hello World']}}),
+])
+def test_add_value(source, key, value, expected):
+    config = Configuration(source)
+
+    config.add_value(key, value)
+
+    assert config.values == expected
+
+
+@pytest.mark.parametrize('source,key,value', [
+    ({'a': []}, 'a:0', 'Hello World'),
+    ({'a': ['Hello World']}, 'a:c', 'Hello World'),
+    ({'a': 'Hello'}, 'a:b:c', 'Hello World')
+])
+def test_apply_key_value_raises_for_invalid_overrides(source, key, value):
+    config = Configuration(source)
+
+    with raises(ConfigurationOverrideError):
+        config.add_value(key, value)
+
+
+

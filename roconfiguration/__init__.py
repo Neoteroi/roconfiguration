@@ -5,11 +5,15 @@ import configparser
 from collections import abc
 
 
-__all__ = ['Configuration', 'ConfigurationError']
+__all__ = ['Configuration', 'ConfigurationError', 'ConfigurationOverrideError']
 
 
 class ConfigurationError(Exception):
     """An exception risen for invalid configuration."""
+
+
+class ConfigurationOverrideError(ConfigurationError):
+    """An exception risen for invalid configuration override."""
 
 
 def apply_key_value(obj, key, value):
@@ -26,7 +30,7 @@ def apply_key_value(obj, key, value):
                     try:
                         index = int(part)
                     except ValueError:
-                        raise ValueError(f'{part} was supposed to be a numeric index in {key}')
+                        raise ConfigurationOverrideError(f'{part} was supposed to be a numeric index in {key}')
 
                     sub_property = sub_property[index]
                     continue
@@ -38,21 +42,26 @@ def apply_key_value(obj, key, value):
                     sub_property = sub_property[part]
                 else:
                     if not isinstance(sub_property, abc.Mapping) and not isinstance(sub_property, abc.MutableSequence):
-                        raise ConfigurationError(f'The key `{key}` cannot be used because it overrides another '
-                                                 f'variable with shorter key! ({part}, {sub_property})')
+                        raise ConfigurationOverrideError(f'The key `{key}` cannot be used because it overrides another '
+                                                         f'variable with shorter key! ({part}, {sub_property})')
 
             if isinstance(sub_property, abc.MutableSequence):
                 try:
                     index = int(last_part)
                 except ValueError:
-                    raise ValueError(f'{last_part} was supposed to be a numeric index in {key}')
+                    raise ConfigurationOverrideError(f'{last_part} was supposed to be a numeric index in {key}, '
+                                                     f'because the affected property is a mutable sequence.')
 
-                sub_property[index] = value
+                try:
+                    sub_property[index] = value
+                except IndexError:
+                    raise ConfigurationOverrideError(f'Invalid override for mutable sequence {key}; '
+                                                     f'assignment index out of range')
             else:
                 try:
                     sub_property[last_part] = value
                 except TypeError as te:
-                    raise TypeError(f'invalid assignment {key} -> {value}; {str(te)}')
+                    raise ConfigurationOverrideError(f'Invalid assignment {key} -> {value}; {str(te)}')
 
             return obj
 
@@ -93,9 +102,6 @@ class Configuration:
         self.__data = {}
         if mapping:
             self.add_map(mapping)
-
-    def __contains__(self, item):
-        return item in self.__data
 
     def __getitem__(self, name):
         return self.__getattr__(name)
