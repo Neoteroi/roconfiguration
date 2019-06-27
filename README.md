@@ -1,4 +1,4 @@
-[![Build status](https://robertoprevato.visualstudio.com/roconfiguration/_apis/build/status/roconfiguration-CI)](https://robertoprevato.visualstudio.com/roconfiguration/_build/latest?definitionId=10) [![pypi](https://robertoprevato.vsrm.visualstudio.com/_apis/public/Release/badge/4e64eee9-f7ef-42ea-95db-bccc8244d41d/1/2)](https://pypi.org/project/roconfiguration/) [![Test coverage](https://img.shields.io/azure-devops/coverage/robertoprevato/roconfiguration/10.svg)](https://robertoprevato.visualstudio.com/roconfiguration/_build?definitionId=10)
+[![Build status](https://robertoprevato.visualstudio.com/roconfiguration/_apis/build/status/roconfiguration-CI)](https://robertoprevato.visualstudio.com/roconfiguration/_build/latest?definitionId=10) [![pypi](https://img.shields.io/pypi/v/roconfiguration.svg?color=blue)](https://pypi.org/project/roconfiguration/) [![Test coverage](https://img.shields.io/azure-devops/coverage/robertoprevato/roconfiguration/10.svg)](https://robertoprevato.visualstudio.com/roconfiguration/_build?definitionId=10)
 
 # Python configuration utilities
 Implementation of key-value pair based configuration for Python applications.
