@@ -104,15 +104,18 @@ class Configuration:
             self.add_map(mapping)
 
     def __getitem__(self, name):
-        return self.__getattr__(name)
+        value = self.__getattr__(name)
+        if value is None:
+            raise KeyError(name)
+        return value
 
-    def __getattr__(self, name):
+    def __getattr__(self, name, default=None):
         if name in self.__data:
             value = self.__data.get(name)
             if isinstance(value, abc.Mapping) or isinstance(value, abc.MutableSequence):
                 return Configuration(value)
             return value
-        raise KeyError(name)
+        return default
 
     @property
     def values(self):
@@ -120,6 +123,9 @@ class Configuration:
         Returns a copy of the dictionary of current settings.
         """
         return self.__data.copy()
+
+    def to_dict(self):
+        return self.values
 
     def add_value(self, name, value):
         """
@@ -141,17 +147,22 @@ class Configuration:
         for key, value in value.items():
             self.__data[key] = value
 
-    def add_environmental_variables(self, prefix=None):
+    def add_environmental_variables(self, prefix=None, strip_prefix=False):
         """
         Reads environmental variables inside this configuration object,
         optionally filtered by prefix.
 
         :param prefix: optional prefix, to filter read environmental variables.
+        :param strip_prefix: whether to strip the prefix when overriding keys by matched env variables
         """
+        if prefix:
+            prefix = prefix.lower()
         for k, v in os.environ.items():
             lk = k.lower()
             if prefix and not lk.startswith(prefix):
                 continue
+            if prefix and strip_prefix:
+                lk = lk[len(prefix):]
             apply_key_value(self.__data, lk, v)
 
     def add_ini(self, ini_settings):

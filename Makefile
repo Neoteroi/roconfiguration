@@ -14,4 +14,4 @@ test:
 
 
 testcov:
-	pytest --cov-report html --cov-report annotate --cov=roconfiguration tests/
+	pytest --cov-report html --cov=roconfiguration tests/

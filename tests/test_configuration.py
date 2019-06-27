@@ -29,7 +29,7 @@ class TestConfiguration:
         config = Configuration({'foo': True})
 
         with pytest.raises(KeyError):
-            print(config.a)
+            print(config['a'])
 
     def test_missing_file_error(self):
         config = Configuration()
@@ -190,7 +190,7 @@ class TestConfiguration:
         config = Configuration()
 
         with pytest.raises(KeyError):
-            print(config.hopefully_there_is_no_env_variable_with_such_name)
+            print(config['hopefully_there_is_no_env_variable_with_such_name'])
 
         config.add_environmental_variables()
 
@@ -211,7 +211,52 @@ class TestConfiguration:
         assert config.app_oof == '3'
 
         with pytest.raises(KeyError):
-            print(config.nope)
+            print(config['nope'])
+
+    def test_dictionary_notation(self):
+        config = Configuration({
+            'a': True
+        })
+
+        assert config['a'] is True
+        assert config.a is True
+        assert config.b is None
+
+    def test_to_dictionary_method(self):
+        source = {
+            'a': [1, 2, 3],
+            'b': {
+                'c': {
+                    'd': 100
+                }
+            }
+        }
+        config = Configuration(source)
+
+        assert config.b.c.d == 100
+        assert config.to_dict() == source
+
+    def test_to_dictionary_method_after_applying_env(self):
+        source = {
+            'a': [1, 2, 3],
+            'b': {
+                'c': {
+                    'd': 100
+                }
+            }
+        }
+        config = Configuration(source)
+
+        assert config.b.c.d == 100
+
+        os.environ['TEST_b__c__d'] = '200'
+
+        config.add_environmental_variables('TEST_', strip_prefix=True)
+
+        assert config.b.c.d == '200'
+        source['b']['c']['d'] = '200'
+
+        assert config.to_dict() == source
 
     def test_override_with_environmental_variables(self):
         config = Configuration({'foo': 10, 'ufo': 20})
