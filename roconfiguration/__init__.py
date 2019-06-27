@@ -103,6 +103,9 @@ class Configuration:
         if mapping:
             self.add_map(mapping)
 
+    def __contains__(self, item):
+        return item in self.__data
+
     def __getitem__(self, name):
         value = self.__getattr__(name)
         if value is None:

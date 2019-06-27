@@ -351,6 +351,14 @@ forward_x11 = no"""
         for b2c_conf in config.Authentication.B2C:
             assert b2c_conf.IssuerName.startswith('example')
 
+    def test_contains(self):
+        config = Configuration({
+            'a': True
+        })
+
+        assert 'a' in config
+        assert not 'b' in config
+
     def test_add_yaml_file(self):
         filepath = pkg_resources.resource_filename(__name__, './yaml_example_01.yaml')
 
