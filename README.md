@@ -192,7 +192,7 @@ assert config.b2c[2].tenant == '3'
 
 # Develop and run tests locally
 ```bash
-pip install -r dev_requirements.txt
+pip install -r requirements.txt
 
 # run tests using automatic discovery:
 pytest
