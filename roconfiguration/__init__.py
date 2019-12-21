@@ -2,6 +2,7 @@ import os
 import yaml
 import json
 import configparser
+from typing import Union, Dict, Any, Sequence
 from collections import abc
 
 
@@ -98,7 +99,7 @@ class Configuration:
             return [cls(item) for item in arg]
         return arg
 
-    def __init__(self, mapping=None):
+    def __init__(self, mapping: Union[None, Dict[str, Any], Sequence[Dict[str, Any]]] = None):
         self.__data = {}
         if mapping:
             self.add_map(mapping)
@@ -119,6 +120,9 @@ class Configuration:
                 return Configuration(value)
             return value
         return default
+
+    def __repr__(self):
+        return repr(self.values)
 
     @property
     def values(self):

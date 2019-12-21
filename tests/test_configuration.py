@@ -18,6 +18,17 @@ class TestConfiguration:
 
         assert config.foo is True
 
+    def test_dict_repr(self):
+        config = Configuration({
+            'foo': True,
+            'hello': 120,
+            'child': {
+                'abc': 'Hello World'
+            }
+        })
+
+        assert repr(config) == repr(config.values)
+
     def test_read_dictionary_notation(self):
         # bad practice, but still supported:
         config = Configuration({'foo.power': True, 'foo': {'power': False}})
@@ -357,7 +368,7 @@ forward_x11 = no"""
         })
 
         assert 'a' in config
-        assert not 'b' in config
+        assert 'b' not in config
 
     def test_add_yaml_file(self):
         filepath = pkg_resources.resource_filename(__name__, './yaml_example_01.yaml')

@@ -7,7 +7,7 @@ def readme():
 
 
 setup(name='roconfiguration',
-      version='1.0.6',
+      version='1.0.7',
       description='Implementation of key-value pair based configuration for Python applications.',
       long_description=readme(),
       long_description_content_type='text/markdown',
