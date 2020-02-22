@@ -27,7 +27,7 @@ steps:
 - script: |
     pip install pytest pytest-cov
     pip install https://github.com/RobertoPrevato/pytest-azurepipelines/archive/css_styles.zip
-    python -m pytest tests/ --cov essentials --cov-report html
+    python -m pytest tests/ --cov roconfiguration --cov-report html
   displayName: Run pytest tests
 
 - script: |
