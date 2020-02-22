@@ -1,2 +1,4 @@
 pytest
 PyYAML
+flake8
+mypy
