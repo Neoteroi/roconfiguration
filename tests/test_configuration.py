@@ -275,7 +275,8 @@ class TestConfiguration:
     def test_add_ini_settings(self):
         config = Configuration()
 
-        ini_settings = dedent("""[DEFAULT]
+        ini_settings = dedent(
+            """[DEFAULT]
             server_alive_interval = 45
             compression = yes
             compression_level = 9
@@ -287,7 +288,8 @@ class TestConfiguration:
 
             [another]
             port = 50022
-            forward_x11 = no""")
+            forward_x11 = no"""
+        )
 
         config.add_ini(ini_settings)
 
