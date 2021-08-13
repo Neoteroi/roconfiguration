@@ -7,6 +7,12 @@
 # Python configuration utilities
 Implementation of key-value pair based configuration for Python applications.
 
+---
+
+### :warning: Please use [essentials-configuration](https://github.com/Neoteroi/essentials-configuration) instead of this library. This library won't be extended with more features.
+
+---
+
 **Features:**
 * support for most common sources of application settings
 * support for overriding settings in sequence
